@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // ----------------------------------
-// MongoDB Connection
+// MONGODB CONNECTION
 // ----------------------------------
 mongoose
   .connect(config.MONGO_URI)
@@ -20,25 +20,21 @@ mongoose
 
 
 // ----------------------------------
-// SIGNUP API (Frontend: signup.html)
+// SIGNUP API
 // ----------------------------------
 app.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validate
     if (!name || !email || !password)
       return res.status(400).json({ msg: "All fields are required" });
 
-    // Check if email exists
     const existing = await User.findOne({ email });
     if (existing)
       return res.status(400).json({ msg: "Email already exists" });
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save to DB
     await User.create({
       name,
       email,
@@ -46,6 +42,7 @@ app.post("/signup", async (req, res) => {
     });
 
     res.json({ msg: "Account created successfully" });
+
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: "Server error" });
@@ -54,31 +51,27 @@ app.post("/signup", async (req, res) => {
 
 
 // ----------------------------------
-// LOGIN API (Frontend: login.html)
+// LOGIN API
 // ----------------------------------
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate
     if (!email || !password)
       return res.status(400).json({ msg: "All fields are required" });
 
-    // Find user
     const user = await User.findOne({ email });
     if (!user)
       return res.status(400).json({ msg: "Invalid email or password" });
 
-    // Compare password
     const match = await bcrypt.compare(password, user.password);
     if (!match)
       return res.status(400).json({ msg: "Invalid email or password" });
 
-    // Success
     res.json({
       msg: "Login successful",
       name: user.name,
-      email: user.email
+      email: user.email,
     });
 
   } catch (err) {
@@ -88,15 +81,17 @@ app.post("/login", async (req, res) => {
 });
 
 
+// ----------------------------------
+// GET USER FROM MONGODB
+// ----------------------------------
 app.get("/user/:email", async (req, res) => {
   try {
     const email = req.params.email;
 
     const user = await User.findOne({ email });
 
-    if (!user) {
+    if (!user)
       return res.status(404).json({ msg: "User not found" });
-    }
 
     res.json({
       name: user.name,
@@ -111,10 +106,10 @@ app.get("/user/:email", async (req, res) => {
   }
 });
 
+
 // ----------------------------------
 // START SERVER
 // ----------------------------------
 app.listen(config.PORT, () => {
   console.log(`Server running on port ${config.PORT}`);
 });
-
