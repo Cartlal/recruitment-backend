@@ -88,6 +88,29 @@ app.post("/login", async (req, res) => {
 });
 
 
+app.get("/user/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.json({
+      name: user.name,
+      email: user.email,
+      role: "User",
+      createdAt: user.createdAt,
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 // ----------------------------------
 // START SERVER
 // ----------------------------------
