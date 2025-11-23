@@ -9,6 +9,9 @@ import User from "./models/User.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
+const emailOtpRoute = require("./routes/emailOtp");
+app.use("/api/email", emailOtpRoute);
+
 
 // ----------------------------------
 // MONGODB CONNECTION
