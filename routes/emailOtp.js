@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
+import nodemailer from "nodemailer";
+
 const router = express.Router();
-const nodemailer = require("nodemailer");
-require("dotenv").config();
 
 const otpStore = new Map();
 const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
@@ -22,12 +22,12 @@ router.post("/send-otp", async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
+    if (!email)
       return res.json({ success: false, message: "Email required" });
-    }
 
     const otp = generateOtp();
     const expiresAt = Date.now() + OTP_EXPIRY_MS;
+
     otpStore.set(email, { otp, expiresAt });
 
     await transporter.sendMail({
@@ -38,6 +38,7 @@ router.post("/send-otp", async (req, res) => {
     });
 
     res.json({ success: true, message: "OTP sent" });
+
   } catch (err) {
     console.error(err);
     res.json({ success: false, message: "Failed to send OTP" });
@@ -47,15 +48,12 @@ router.post("/send-otp", async (req, res) => {
 router.post("/verify-otp", (req, res) => {
   const { email, otp } = req.body;
 
-  if (!email || !otp) {
+  if (!email || !otp)
     return res.json({ success: false, message: "Invalid input" });
-  }
 
   const record = otpStore.get(email);
-
-  if (!record) {
+  if (!record)
     return res.json({ success: false, message: "OTP not found" });
-  }
 
   if (Date.now() > record.expiresAt) {
     otpStore.delete(email);
