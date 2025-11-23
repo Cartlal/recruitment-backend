@@ -30,7 +30,7 @@ router.post("/send-otp", async (req, res) => {
 
     // Send email through Resend API
     await resend.emails.send({
-      from: "Recruitment <no-reply@recruitment.dev>",
+      from: "Acme <onboarding@resend.dev>",
       to: email,
       subject: "Your OTP Code",
       html: `<p>Your OTP is <b>${otp}</b>. It expires in 5 minutes.</p>`,
