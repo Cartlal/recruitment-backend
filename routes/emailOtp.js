@@ -70,4 +70,4 @@ router.post("/verify-otp", (req, res) => {
   return res.json({ success: false, message: "Incorrect OTP" });
 });
 
-module.exports = router;
+export default router;
