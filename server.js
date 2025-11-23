@@ -5,13 +5,15 @@ import cors from "cors";
 
 import config from "./config.js";
 import User from "./models/User.js";
+import emailOtpRoute from "./routes/emailOtp.js";   // FIXED ESM import
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
-const emailOtpRoute = require("./routes/emailOtp.js");
-app.use("/api/email", emailOtpRoute);
 
+// OTP route
+app.use("/api/email", emailOtpRoute);
 
 // ----------------------------------
 // MONGODB CONNECTION
@@ -20,7 +22,6 @@ mongoose
   .connect(config.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("Mongo error:", err));
-
 
 // ----------------------------------
 // SIGNUP API
@@ -38,11 +39,7 @@ app.post("/signup", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
+    await User.create({ name, email, password: hashedPassword });
 
     res.json({ msg: "Account created successfully" });
 
@@ -51,7 +48,6 @@ app.post("/signup", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 
 // ----------------------------------
 // LOGIN API
@@ -83,14 +79,12 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
 // ----------------------------------
-// GET USER FROM MONGODB
+// GET USER FROM DB
 // ----------------------------------
 app.get("/user/:email", async (req, res) => {
   try {
     const email = req.params.email;
-
     const user = await User.findOne({ email });
 
     if (!user)
@@ -108,7 +102,6 @@ app.get("/user/:email", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 
 // ----------------------------------
 // START SERVER
